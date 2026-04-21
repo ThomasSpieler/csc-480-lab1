@@ -17,6 +17,7 @@ from dataclasses import dataclass
 
 class WizardDFS(WizardSearchAgent):
     @dataclass(eq=True, frozen=True, order=True)
+    # Search State: the wizard location and portal location (used to keep track)
     class SearchState:
         wizard_loc: Location
         portal_loc: Location
@@ -61,12 +62,19 @@ class WizardDFS(WizardSearchAgent):
         return state.wizard_loc == state.portal_loc
 
     def next_search_expansion(self) -> GameState | None:
+        # Returns a game state the agent wants to expand based on:
+            # The agent's internal queue/stack of nodes to expand (which is builds in process search expansion)
         # TODO: YOUR CODE HERE
         raise NotImplementedError
 
     def process_search_expansion(
         self, source: GameState, target: GameState, action: WizardMoves
     ) -> None:
+        # Use the source and target inputs to record within the agent:
+            # Based on the (input) source and the (input) action, what the path to the (input) target is ; keep track of this in the dictionary of nodes the agent can access and the path of actions to reach them.
+            # Put the target in the queue
+        # Keep track of the path and nodes that we can expand.
+        # Update path (an attribute of this class consisting of WizardActions - see SearchWizard class in agents.py) if the target is the goal and we want to return our final path.
         # TODO: YOUR CODE HERE
         raise NotImplementedError
 
