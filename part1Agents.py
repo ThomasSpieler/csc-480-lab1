@@ -185,6 +185,7 @@ class WizardAstar(WizardSearchAgent):
 
     paths: dict[SearchState, tuple[float, list[WizardMoves]]] = {}
     search_pq: list[tuple[float, SearchState]] = []
+    searched: list[SearchState] = []
     initial_game_state: GameState
 
     def search_to_game(self, search_state: SearchState) -> GameState:
@@ -226,18 +227,48 @@ class WizardAstar(WizardSearchAgent):
         return 1
 
     def heuristic(self, target: GameState) -> float:
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        # Manhattan Distance
+        wizardLoc = target.get_all_entity_locations(Wizard)[0]
+        portalLoc = target.get_all_tile_locations(Portal)[0]
+        return abs(wizardLoc.row - portalLoc.row) + abs(wizardLoc.col - portalLoc.col)
+        # Job done
 
     def next_search_expansion(self) -> GameState | None:
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        # Chooses the next search node to expand
+        return_node = heapq.heappop(self.search_pq)[1]
+        # Add the node we're expanding to the list of searched nodes
+        self.searched.append(return_node)
+        return self.search_to_game(return_node)
 
     def process_search_expansion(
         self, source: GameState, target: GameState, action: WizardMoves
     ) -> None:
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        # Update paths.
+        target_SearchState = self.SearchState(wizard_loc=target.get_all_entity_locations(Wizard)[0], portal_loc=target.get_all_tile_locations(Portal)[0])
+        source_SearchState = self.SearchState(wizard_loc=source.get_all_entity_locations(Wizard)[0], portal_loc=source.get_all_tile_locations(Portal)[0])
+            # If we know the path to the start, preface the path to the target with the source's path. Otherwise (like at the start), start a new path.
+        
+        if (source_SearchState in self.paths):
+            source_path = self.paths[source_SearchState]
+            target_path = [action] + source_path[1]
+            cost = len(target_path)
+            self.paths[target_SearchState] = (cost + self.heuristic(target), target_path)
+        else:
+            cost = 1
+            self.paths[target_SearchState] = (cost + self.heuristic(target), [action])
+            # Job done
+        # Job done.
+
+        insert_candidate = (cost + self.heuristic(target), target_SearchState)
+        # Update the list of nodes to expand if we haven't explored it yet.
+        if ((target_SearchState not in self.searched) and (insert_candidate not in self.search_pq)):
+            heapq.heappush(self.search_pq, insert_candidate)
+        # Job done.
+
+        # If the target is the goal, update the class plan to match the path to the target.
+        if (target_SearchState.wizard_loc == target_SearchState.portal_loc):
+            self.plan = self.paths[target_SearchState][1]
+        # Job done.
 
 
 class CrystalSearchWizard(WizardSearchAgent):
