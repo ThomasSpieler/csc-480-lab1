@@ -62,21 +62,33 @@ class WizardDFS(WizardSearchAgent):
         return state.wizard_loc == state.portal_loc
 
     def next_search_expansion(self) -> GameState | None:
-        # Returns a game state the agent wants to expand based on:
-            # The agent's internal queue/stack of nodes to expand (which is builds in process search expansion)
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        # Chooses the next search node to expand
+        return self.search_to_game(self.search_stack.pop())
 
     def process_search_expansion(
         self, source: GameState, target: GameState, action: WizardMoves
     ) -> None:
-        # Use the source and target inputs to record within the agent:
-            # Based on the (input) source and the (input) action, what the path to the (input) target is ; keep track of this in the dictionary of nodes the agent can access and the path of actions to reach them.
-            # Put the target in the queue
-        # Keep track of the path and nodes that we can expand.
-        # Update path (an attribute of this class consisting of WizardActions - see SearchWizard class in agents.py) if the target is the goal and we want to return our final path.
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        # Update path (an attribute of this class consisting of WizardActions - see SearchWizard class in agents.py).
+        target_SearchState = self.SearchState(wizard_loc=target.get_all_entity_locations(Wizard)[0], portal_loc=target.get_all_tile_locations(Portal)[0])
+        source_SearchState = self.SearchState(wizard_loc=source.get_all_entity_locations(Wizard)[0], portal_loc=source.get_all_tile_locations(Portal)[0])
+
+        if (source_SearchState in self.paths):
+            source_path = self.paths[source_SearchState]
+            target_path = source_path + [action]
+            self.paths[target_SearchState] = target_path
+        else:
+            self.paths[target_SearchState] = [action]
+        # Job done.
+
+        # Update the list of nodes to expand if we haven't explored it yet.
+        if (target_SearchState not in self.search_stack):
+            self.search_stack.insert(0, target_SearchState)
+        # Jobe done.
+
+        # If the target is the goal, update the class plan to match the path to the target.
+        if (target_SearchState.wizard_loc == target_SearchState.portal_loc):
+            self.plan = self.paths[target_SearchState]
+        # Job done.
 
 
 class WizardBFS(WizardSearchAgent):
@@ -217,6 +229,10 @@ class CrystalSearchWizard(WizardSearchAgent):
 
 
 class SuboptimalCrystalSearchWizard(CrystalSearchWizard):
+    @dataclass(eq=True, frozen=True, order=True)
+    class SearchState:
+        wizard_loc: Location
+        portal_loc: Location
 
     def heuristic(self, target: SearchState) -> float:
         # TODO YOUR CODE HERE
