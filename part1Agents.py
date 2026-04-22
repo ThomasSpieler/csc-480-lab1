@@ -89,7 +89,7 @@ class WizardDFS(WizardSearchAgent):
         # Update the list of nodes to expand if we haven't explored it yet.
         if ((target_SearchState not in self.searched) and (target_SearchState not in self.search_stack)):
             self.search_stack.append(target_SearchState)
-        # Jobe done.
+        # Job done.
 
         # If the target is the goal, update the class plan to match the path to the target.
         if (target_SearchState.wizard_loc == target_SearchState.portal_loc):
@@ -169,7 +169,7 @@ class WizardBFS(WizardSearchAgent):
         # Update the list of nodes to expand if we haven't explored it yet.
         if ((target_SearchState not in self.searched) and (target_SearchState not in self.search_stack)):
             self.search_stack.insert(0, target_SearchState)
-        # Jobe done.
+        # Job done.
 
         # If the target is the goal, update the class plan to match the path to the target.
         if (target_SearchState.wizard_loc == target_SearchState.portal_loc):
